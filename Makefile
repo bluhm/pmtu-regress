@@ -1,4 +1,4 @@
-#	$OpenBSD: Makefile,v 1.6 2016/03/30 11:09:56 bluhm Exp $
+#	$OpenBSD$
 
 # The following ports must be installed:
 #
@@ -19,36 +19,35 @@ regress:
 # Set up machines: LOCAL REMOTE
 # LOCAL is the machine where this makefile is running.
 # REMOTE is running OpenBSD with ARP to test the Address Resolution Protocol.
-# FAKE is an non existing machine, its IP is used in the tests.
-# OTHER is an IP on REMOTE, but configured on another interface.
-# OTHERFAKE is an non existing IP on another interface.
+# FAKE is an non existing machine in a non existing network.
 # REMOTE_SSH is the hostname to log in on the REMOTE machine.
 
 # Configure Addresses on the machines.
 # Adapt interface and addresse variables to your local setup.
 #
 LOCAL_IF ?=
-LOCAL_MAC ?=
-REMOTE_MAC ?=
-FAKE_MAC ?= 12:34:56:78:9a:bc
-PROXY_MAC ?= 00:90:27:bb:cc:dd
 REMOTE_SSH ?=
 
-LOCAL_ADDR ?= 10.188.70.17
-REMOTE_ADDR ?= 10.188.70.70
-FAKE_ADDR ?= 10.188.70.188
-OTHER_ADDR ?= 10.188.211.70
-OTHERFAKE_ADDR ?= 10.188.211.188
+LOCAL_ADDR ?= 
+REMOTE_ADDR ?=
+FAKE_NET ?=
+FAKE_NET_ADDR ?=
 
-.if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
-    empty (FAKE_MAC) || empty (REMOTE_SSH) || empty (LOCAL_ADDR) || \
-    empty (REMOTE_ADDR) || empty (FAKE_ADDR) || empty (OTHER_ADDR) || \
-    empty (OTHERFAKE_ADDR)
+LOCAL_ADDR6 ?= 
+REMOTE_ADDR6 ?=
+FAKE_NET6 ?=
+FAKE_NET_ADDR6 ?=
+
+.if empty (LOCAL_IF) || empty (REMOTE_SSH) || \
+    empty (LOCAL_ADDR) || empty (LOCAL_ADDR6) || \
+    empty (REMOTE_ADDR) || empty (REMOTE_ADDR6) || \
+    empty (FAKE_NET) || empty (FAKE_NET6) || \
+    empty (FAKE_NET_ADDR) || empty (FAKE_NET_ADDR6)
 regress:
-	@echo this tests needs a remote machine to operate on
-	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC FAKE_MAC REMOTE_SSH LOCAL_ADDR
-	@echo REMOTE_ADDR FAKE_ADDR OTHER_ADDR OTHERFAKE_ADDR are empty
-	@echo fill out these variables for additional tests
+	@echo This tests needs a remote machine to operate on
+	@echo LOCAL_IF REMOTE_SSH LOCAL_ADDR LOCAL_ADDR6 REMOTE_ADDR
+	@echo REMOTE_ADDR6 FAKE_NET FAKE_NET6 FAKE_NET_ADDR FAKE_NET_ADDR6
+	@echo are empty.  Fill out these variables for additional tests.
 .endif
 
 depend: addr.py
@@ -57,12 +56,10 @@ depend: addr.py
 addr.py: Makefile
 	rm -f $@ $@.tmp
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
-.for var in LOCAL REMOTE FAKE
-	echo '${var}_MAC = "${${var}_MAC}"' >>$@.tmp
-.endfor
-.for var in LOCAL REMOTE FAKE OTHER OTHERFAKE
+.for var in LOCAL REMOTE FAKE_NET
 	echo '${var}_ADDR = "${${var}_ADDR}"' >>$@.tmp
 .endfor
+	echo 'FAKE_NET = "FAKE_NET"' >>$@.tmp
 	mv $@.tmp $@
 
 # Set variables so that make runs with and without obj directory.
@@ -75,11 +72,14 @@ PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 ${.CURDIR}/
 
 .PHONY: clean-arp
 
-# Clear local and remote ARP cache.
-clean-arp:
+# Clear local and remote path mtu routes, set fake net route
+reset-route6:
 	@echo '\n======== $@ ========'
-	${SUDO} arp -da
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -da
+	-${SUDO} route -n delete -host ${REMOTE_ADDR6}
+	-ssh -t ${REMOTE_SSH} ${SUDO} sh -c "'\
+	    route -n delete -inet6 -host ${LOCAL_ADDR6};\
+	    route -n delete -inet6 -host ${FAKE_NET_ADDR6};\
+	    route -n add -inet6 -net ${FAKE_NET6} ${LOCAL_ADDR6}'"
 
 # Clear ARP cache and ping all addresses.  This ensures that
 # the IP addresses are configured and all routing table are set up
