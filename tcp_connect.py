@@ -31,4 +31,9 @@ rst=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='AR',
     ack=synack.seq+1)
 send(IP(src=FAKE_NET_ADDR, dst=REMOTE_ADDR)/rst, iface=LOCAL_IF)
 
+len = data.len
+print "len=%d" % len
+if len != 1300:
+	print "TCP data packet len is %d, expected 1300" % len
+	exit(1)
 exit(0)
