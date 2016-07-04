@@ -9,11 +9,12 @@ packets.
 
 After the three-way handshake REMOTE fills the virtual TCP receive
 buffer of FAKE_NET_ADDR with generated chars.  The data is not
-acknowledged.  Then LOCAL sends an fragmentation-needed ICMP packet
-and expects REMOTE to retransmit the TCP data.
+acknowledged.  Then LOCAL sends a fragmentation-needed ICMP packet
+and expects REMOTE to retransmit the TCP data.  It is checked that
+the TCP packet from the REMOTE side has the MTU size that was
+announced in the ICMP packet.
 
-It is checked that the TCP packet from the REMOTE side has the MTU
-size that was announced in the ICMP packet.
+The same test is done with IPv6 and a package too big ICMP6 packet.
 
 EXAMPLE
 
@@ -49,6 +50,8 @@ sshd_flags=
 - My environment when executing the test
 
 LOCAL_IF=tap0
+LOCAL_MAC=fe:e1:ba:d0:d5:6d
+REMOTE_MAC=70:5f:ca:21:8d:70
 REMOTE_SSH=q70
 
 LOCAL_ADDR=10.188.70.17
@@ -58,5 +61,5 @@ FAKE_NET_ADDR=10.188.188.188
 
 LOCAL_ADDR6=fdd7:e83e:66bc:70:3e97:eff:fea7:9b2
 REMOTE_ADDR6=fdd7:e83e:66bc:70:725f:caff:fe21:8d70
-FAKE_NET6=fdd7:e83e:66bc:188::/24
+FAKE_NET6=fdd7:e83e:66bc:188::/64
 FAKE_NET_ADDR6=fdd7:e83e:66bc:188::188
