@@ -56,10 +56,14 @@ depend: addr.py
 addr.py: Makefile
 	rm -f $@ $@.tmp
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
+	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
+	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
 .for var in LOCAL REMOTE FAKE_NET
 	echo '${var}_ADDR = "${${var}_ADDR}"' >>$@.tmp
+	echo '${var}_ADDR6 = "${${var}_ADDR6}"' >>$@.tmp
 .endfor
-	echo 'FAKE_NET = "FAKE_NET"' >>$@.tmp
+	echo 'FAKE_NET = "${FAKE_NET}"' >>$@.tmp
+	echo 'FAKE_NET6 = "${FAKE_NET6}"' >>$@.tmp
 	mv $@.tmp $@
 
 # Set variables so that make runs with and without obj directory.
@@ -81,32 +85,41 @@ reset-route:
 	    route -n delete -inet -net ${FAKE_NET};\
 	    route -n delete -inet -host ${FAKE_NET_ADDR};\
 	    route -n add -inet -net ${FAKE_NET} ${LOCAL_ADDR}'"
-
 reset-route6:
 	@echo '\n======== $@ ========'
 	-${SUDO} route -n delete -host ${REMOTE_ADDR6}
 	ssh -t ${REMOTE_SSH} ${SUDO} sh -c "'\
 	    route -n delete -inet6 -host ${LOCAL_ADDR6};\
-	    route -n delete -inet6 -net ${FAKE_NET};\
+	    route -n delete -inet6 -net ${FAKE_NET6};\
 	    route -n delete -inet6 -host ${FAKE_NET_ADDR6};\
 	    route -n add -inet6 -net ${FAKE_NET6} ${LOCAL_ADDR6}'"
 
 # Clear host routes and ping all addresses.  This ensures that
 # the IP addresses are configured and all routing table are set up
 # to allow bidirectional packet flow.
-TARGETS +=	ping
+TARGETS +=	ping ping6
 run-regress-ping: reset-route
 	@echo '\n======== $@ ========'
 .for ip in LOCAL_ADDR REMOTE_ADDR
 	@echo Check ping ${ip}
 	ping -n -c 1 ${${ip}}
 .endfor
+run-regress-ping6: reset-route
+	@echo '\n======== $@ ========'
+.for ip in LOCAL_ADDR REMOTE_ADDR
+	@echo Check ping6 ${ip}6
+	ping6 -n -c 1 ${${ip}6}
+.endfor
 
-TARGETS +=	pmtu
+TARGETS +=	pmtu pmtu6
 run-regress-pmtu: addr.py reset-route
 	@echo '\n======== $@ ========'
-	@echo Send icmp fragmentation needed after fake connect
+	@echo Send ICMP fragmentation needed after fake TCP connect
 	${SUDO} ${PYTHON}tcp_connect.py
+run-regress-pmtu6: addr.py reset-route6
+	@echo '\n======== $@ ========'
+	@echo Send ICMP6 packet too big after fake TCP connect
+	${SUDO} ${PYTHON}tcp_connect6.py
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
