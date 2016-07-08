@@ -14,7 +14,7 @@ print "Send UDP packet with 1400 octets payload, receive echo."
 data=''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase +
     string.digits) for _ in range(1400))
 udp=UDP(sport=port, dport='echo')/data
-echo=srp1(e/ip6/udp, iface=LOCAL_IF)
+echo=srp1(e/ip6/udp, iface=LOCAL_IF, timeout=5)
 
 print "Fill our fragment cache."
 time.sleep(1)
@@ -36,7 +36,7 @@ print "Path MTU discovery will send UDP fragment with length 1300."
 udpfrag6=IPv6ExtHdrFragment()/UDP(sport=port, dport='echo')/data
 p=e/ip6/udpfrag6
 p.show2()
-frag=srp1(e/ip6/udpfrag6, nofilter=1, iface=LOCAL_IF)
+frag=srp1(e/ip6/udpfrag6, nofilter=1, iface=LOCAL_IF, timeout=5)
 
 len = frag.plen + len(IPv6())
 print "len=%d" % len

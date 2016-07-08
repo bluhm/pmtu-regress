@@ -10,12 +10,12 @@ port=os.getpid() & 0xffff
 
 print "Send SYN packet, receive SYN+ACK."
 syn=TCP(sport=port, dport='chargen', seq=1, flags='S', window=(2**16)-1)
-synack=srp1(e/ip6/syn, iface=LOCAL_IF)
+synack=srp1(e/ip6/syn, iface=LOCAL_IF, timeout=5)
 
 print "Send ack packet, receive chargen data."
 ack=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='A',
     ack=synack.seq+1, window=(2**16)-1)
-data=srp1(e/ip6/ack, iface=LOCAL_IF)
+data=srp1(e/ip6/ack, iface=LOCAL_IF, timeout=5)
 
 print "Fill our receive buffer."
 time.sleep(1)
@@ -25,7 +25,7 @@ icmp6=ICMPv6PacketTooBig(mtu=1300)/data.payload
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/icmp6, iface=LOCAL_IF)
 
 print "Path MTU discovery will resend first data with length 1300."
-data=srp1(e/ip6/ack, iface=LOCAL_IF)
+data=srp1(e/ip6/ack, iface=LOCAL_IF, timeout=5)
 
 print "Cleanup the other's socket with a reset packet."
 rst=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='AR',
