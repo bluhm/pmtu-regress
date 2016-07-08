@@ -20,10 +20,10 @@ print "Send ICMP6 packet too big packet with MTU 1300."
 icmp6=ICMPv6PacketTooBig(mtu=1300)/echo.payload
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/icmp6, iface=LOCAL_IF)
 
-print "Clear route cache at echo socket by sending to different address."
-sendp(e/IPv6(src="fdd7:e83e:66bc:188::", dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
+print "Clear route cache at echo socket by sending from different address."
+sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 
-print "Path MTU discovery will send UDP fragment with length 1300."
+print "Path MTU discovery will send UDP fragment with maximum length 1300."
 # srp1 cannot be used, fragment answer will not match on outgoing udp packet
 if os.fork() == 0:
         time.sleep(1)
@@ -48,7 +48,7 @@ else:
 
 len = frag.plen + len(IPv6())
 print "len=%d" % len
-# fragments contain multiple of 8 octets, so expected len is 1296
+print "Fragments contain multiple of 8 octets, so expected len is 1296"
 if len != 1296:
 	print "ERROR: UDP fragment len is %d, expected 1296." % len
 	exit(1)
