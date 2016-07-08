@@ -46,10 +46,18 @@ else:
 	print "ERROR: no matching IPv6 fragment UDP answer found"
 	exit(1)
 
-len = frag.plen + len(IPv6())
-print "len=%d" % len
-print "Fragments contain multiple of 8 octets, so expected len is 1296"
-if len != 1296:
-	print "ERROR: UDP fragment len is %d, expected 1296." % len
+print "UDP echo has IPv6 and UDP header, so expected payload len is 1448"
+elen = echo.plen + len(IPv6())
+print "elen=%d" % elen
+if elen != 1448:
+	print "ERROR: UDP echo paylod len is %d, expected 1448." % elen
 	exit(1)
+
+print "Fragments contain multiple of 8 octets, so expected len is 1296"
+flen = frag.plen + len(IPv6())
+print "flen=%d" % flen
+if flen != 1296:
+	print "ERROR: UDP fragment len is %d, expected 1296." % flen
+	exit(1)
+
 exit(0)
