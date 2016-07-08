@@ -18,7 +18,7 @@ regress:
 # This test needs a manual setup of two machines
 # Set up machines: LOCAL REMOTE
 # LOCAL is the machine where this makefile is running.
-# REMOTE is running OpenBSD with ARP to test the Address Resolution Protocol.
+# REMOTE is running OpenBSD with echo and chargen server to test PMTU
 # FAKE is an non existing machine in a non existing network.
 # REMOTE_SSH is the hostname to log in on the REMOTE machine.
 
