@@ -26,9 +26,9 @@ sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 print "Path MTU discovery will send UDP fragment with maximum length 1300."
 # srp1 cannot be used, fragment answer will not match on outgoing udp packet
 if os.fork() == 0:
-        time.sleep(1)
-        sendp(e/ip6/udp, iface=LOCAL_IF)
-        os._exit(0)
+	time.sleep(1)
+	sendp(e/ip6/udp, iface=LOCAL_IF)
+	os._exit(0)
 
 ans=sniff(iface=LOCAL_IF, timeout=3, filter=
     "ip6 and src "+ip6.dst+" and dst "+ip6.src+" and proto ipv6-frag")
