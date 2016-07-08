@@ -121,6 +121,12 @@ run-regress-pmtu6: addr.py reset-route6
 	@echo Send ICMP6 packet too big after fake TCP connect
 	${SUDO} ${PYTHON}tcp_connect6.py
 
+TARGETS +=	udp6
+run-regress-udp6: addr.py reset-route6
+	@echo '\n======== $@ ========'
+	@echo Send ICMP6 packet too big after UDP echo
+	${SUDO} ${PYTHON}udp_echo6.py
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
