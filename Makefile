@@ -127,8 +127,20 @@ run-regress-udp6: addr.py reset-route6
 	@echo Send ICMP6 packet too big after UDP echo
 	${SUDO} ${PYTHON}udp_echo6.py
 
+TARGETS +=	gateway6
+run-regress-gateway6: run-regress-udp6
+	@echo '\n======== $@ ========'
+	@echo Remove gateway route of a dynamic PMTU route
+	ssh ${REMOTE_SSH} ${SUDO} route -n delete -inet6 -host ${LOCAL_ADDR6}
+	ssh ${REMOTE_SSH} route -n get -inet6 -host ${FAKE_NET_ADDR6}\
+	    >pmtu.route
+	cat pmtu.route
+	grep -q 'gateway: ${LOCAL_ADDR6}' pmtu.route
+	grep -q 'flags: <UP,GATEWAY,HOST,DYNAMIC,DONE>' pmtu.route
+	${SUDO} ${PYTHON}udp_echo6.py
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
-CLEANFILES +=		addr.py *.pyc *.log
+CLEANFILES +=		addr.py *.pyc *.log *.route
 
 .include <bsd.regress.mk>
