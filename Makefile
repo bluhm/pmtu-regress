@@ -27,6 +27,8 @@ regress:
 # Adapt interface and addresse variables to your local setup.
 #
 LOCAL_IF ?=
+LOCAL_MAC ?=
+REMOTE_MAC ?=
 REMOTE_SSH ?=
 
 LOCAL_ADDR ?=
@@ -40,25 +42,25 @@ FAKE_NET6 ?=
 FAKE_NET_ADDR6 ?=
 
 .if empty (LOCAL_IF) || empty (REMOTE_SSH) || \
+    empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
     empty (LOCAL_ADDR) || empty (LOCAL_ADDR6) || \
     empty (REMOTE_ADDR) || empty (REMOTE_ADDR6) || \
     empty (FAKE_NET) || empty (FAKE_NET6) || \
     empty (FAKE_NET_ADDR) || empty (FAKE_NET_ADDR6)
 regress:
 	@echo This tests needs a remote machine to operate on
-	@echo LOCAL_IF REMOTE_SSH LOCAL_ADDR LOCAL_ADDR6 REMOTE_ADDR
-	@echo REMOTE_ADDR6 FAKE_NET FAKE_NET6 FAKE_NET_ADDR FAKE_NET_ADDR6
+	@echo LOCAL_IF REMOTE_SSH LOCAL_MAC REMOTE_MAC LOCAL_ADDR LOCAL_ADDR6
+	@echo REMOTE_ADDR REMOTE_ADDR6 FAKE_NET FAKE_NET6 FAKE_NET_ADDR
+	@echo FAKE_NET_ADDR6
 	@echo are empty.  Fill out these variables for additional tests.
 	@echo SKIPPED
 .endif
 
-.if ! empty (REMOTE_SSH)
 .if make (regress) || make (all)
 .BEGIN: pf.conf addr.py
 	@echo
 	${SUDO} true
 	ssh -t ${REMOTE_SSH} ${SUDO} true
-.endif
 .endif
 
 depend: addr.py
