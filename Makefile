@@ -182,5 +182,25 @@ check-setup-local:
 
 check-setup-remote:
 	@echo '\n======== $@ ========'
+	ssh ${REMOTE_SSH} ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} route -n get -inet ${REMOTE_ADDR} | grep -q 'flags: .*LOCAL'  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} arp -na | grep -q '^${REMOTE_ADDR} * ${REMOTE_MAC} * .* permanent'  # REMOTE_ADDR REMOTE_MAC
+	ssh ${REMOTE_SSH} ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+.for ip in FAKE_NET FAKE_NET_ADDR
+	ssh ${REMOTE_SSH} route -n get -inet ${${ip}} | fgrep -q 'gateway: ${LOCAL_ADDR}'  # ${ip} LOCAL_ADDR
+.endfor
+	ssh ${REMOTE_SSH} ping6 -n -c 1 ${REMOTE_ADDR6}  # REMOTE_ADDR6
+	ssh ${REMOTE_SSH} route -n get -inet6 ${REMOTE_ADDR6} | grep -q 'flags: .*LOCAL'  # REMOTE_ADDR6
+	ssh ${REMOTE_SSH} ndp -na | grep -q '^${REMOTE_ADDR6} * ${REMOTE_MAC} * .* permanent'  # REMOTE_ADDR6 REMOTE_MAC
+	ssh ${REMOTE_SSH} ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
+.for ip in FAKE_NET6 FAKE_NET_ADDR6
+	ssh ${REMOTE_SSH} route -n get -inet6 ${${ip}} | fgrep -q 'gateway: ${LOCAL_ADDR6}'  # ${ip} LOCAL_ADDR6
+.endfor
+.for af in inet inet6
+	ssh ${ECO_SSH} netstat -a -f ${af} -p tcp | fgrep ' *.chargen '
+.endfor
+	ssh ${ECO_SSH} netstat -a -f inet6 -p udp | fgrep ' *.echo '
+	ssh ${REMOTE_SSH} ${SUDO} pfctl -sr | grep '^anchor "regress" all$$'
+	ssh ${REMOTE_SSH} ${SUDO} pfctl -si | grep '^Status: Enabled '
 
 .include <bsd.regress.mk>
