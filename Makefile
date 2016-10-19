@@ -92,20 +92,12 @@ PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 -u ${.CURDIR}/
 # Clear local and remote path mtu routes, set fake net route
 reset-route:
 	@echo '\n======== $@ ========'
-	-${SUDO} route -n delete -host ${REMOTE_ADDR}
-	ssh ${REMOTE_SSH} ${SUDO} sh -c "'\
-	    route -n delete -inet -host ${LOCAL_ADDR};\
-	    route -n delete -inet -net ${FAKE_NET};\
-	    route -n delete -inet -host ${FAKE_NET_ADDR};\
-	    route -n add -inet -net ${FAKE_NET} ${LOCAL_ADDR}'"
+	${SUDO} route -n delete -inet -host ${REMOTE_ADDR} || true
+	ssh ${REMOTE_SSH} ${SUDO} route -n delete -inet -host ${FAKE_NET_ADDR} || true
 reset-route6:
 	@echo '\n======== $@ ========'
-	-${SUDO} route -n delete -host ${REMOTE_ADDR6}
-	ssh ${REMOTE_SSH} ${SUDO} sh -c "'\
-	    route -n delete -inet6 -host ${LOCAL_ADDR6};\
-	    route -n delete -inet6 -net ${FAKE_NET6};\
-	    route -n delete -inet6 -host ${FAKE_NET_ADDR6};\
-	    route -n add -inet6 -net ${FAKE_NET6} ${LOCAL_ADDR6}'"
+	${SUDO} route -n delete -inet6 -host ${REMOTE_ADDR6} || true
+	ssh ${REMOTE_SSH} ${SUDO} route -n delete -inet6 -host ${FAKE_NET_ADDR6} || true
 
 # Clear host routes and ping all addresses.  This ensures that
 # the IP addresses are configured and all routing table are set up
