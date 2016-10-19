@@ -156,4 +156,31 @@ REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log *.route
 
+.PHONY: check-setup check-setup-local check-setup-remote
+
+# Check wether the address, route and remote setup is correct
+check-setup: check-setup-local check-setup-remote
+
+check-setup-local:
+	@echo '\n======== $@ ========'
+	ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+	route -n get -inet ${LOCAL_ADDR} | grep -q 'flags: .*LOCAL'  # LOCAL_ADDR
+	arp -na | grep -q '^${LOCAL_ADDR} * ${LOCAL_MAC} * ${LOCAL_IF} permanent'  # LOCAL_ADDR LOCAL_MAC LOCAL_IF
+	ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	route -n get -inet ${REMOTE_ADDR} | fgrep -q 'interface: ${LOCAL_IF}'  # REMOTE_ADDR LOCAL_IF
+	! ping -n -c 1 -w 1 ${FAKE_NET_ADDR}  # FAKE_NET_ADDR
+	route -n get -inet ${FAKE_NET_ADDR} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET_ADDR
+	route -n get -inet -net ${FAKE_NET} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET
+	ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
+	route -n get -inet6 ${LOCAL_ADDR6} | grep -q 'flags: .*LOCAL'  # LOCAL_ADDR6
+	ndp -na | grep -q '^${LOCAL_ADDR6} * ${LOCAL_MAC} * ${LOCAL_IF} permanent'  # LOCAL_ADDR6 LOCAL_MAC LOCAL_IF
+	ping6 -n -c 1 ${REMOTE_ADDR6}  # REMOTE_ADDR6
+	route -n get -inet6 ${REMOTE_ADDR6} | fgrep -q 'interface: ${LOCAL_IF}'  # REMOTE_ADDR6 LOCAL_IF
+	! ping -n -c 1 -w 1 ${FAKE_NET_ADDR6}  # FAKE_NET_ADDR6
+	route -n get -inet6 ${FAKE_NET_ADDR6} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET_ADDR6
+	route -n get -inet6 -net ${FAKE_NET6} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET6
+
+check-setup-remote:
+	@echo '\n======== $@ ========'
+
 .include <bsd.regress.mk>
