@@ -17,7 +17,7 @@ udp=UDP(sport=port, dport='echo')/data
 echo=srp1(e/ip6/udp, iface=LOCAL_IF, timeout=5)
 
 if echo is None:
-	print "ERROR: no unfragmented IPv6 UDP answer received"
+	print "ERROR: no UDP answer from echo server received"
 	exit(1)
 
 print "Send ICMP6 packet too big packet with MTU 1300."
