@@ -40,6 +40,7 @@ if os.fork() == 0:
 ans=sniff(iface=LOCAL_IF, timeout=3, filter=
     "ip6 and src "+ip6.dst+" and dst "+ip6.src+" and proto ipv6-frag")
 
+frag=None
 for a in ans:
 	fh=a.payload.payload
 	if fh.offset != 0 or fh.nh != (ip6/udp).nh:
@@ -49,30 +50,19 @@ for a in ans:
 		continue
 	frag=a
 	break
-else:
-	print "ERROR: no matching IPv6 fragment UDP answer found"
+
+if frag is not None:
+	print "ERROR: matching IPv6 fragment UDP answer found"
 	exit(1)
 
-if frag.offset != 0:
-	print "ERROR: TCP fragment is not atomic, offset is %d." % frag.offset
-	exit(1)
-
-if frag.m != 0:
-	print "ERROR: TCP fragment is not atomic, more fragment bit is set."
-	exit(1)
+print "Send echo again and expect reply without fragmentation."
+reply=srp1(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 
 print "UDP echo has IPv6 and UDP header, so expected payload len is 1248"
-elen = echo.plen + len(IPv6())
-print "elen=%d" % elen
+elen = reply.plen + len(IPv6())
+print "rlen=%d" % elen
 if elen != 1248:
-	print "ERROR: UDP echo payload len is %d, expected 1248." % elen
-	exit(1)
-
-print "Atomic fragment contains 8 octet header, so expected len is 1256"
-flen = frag.plen + len(IPv6())
-print "flen=%d" % flen
-if flen != 1256:
-	print "ERROR: UDP atomic fragment len is %d, expected 1256." % flen
+	print "ERROR: UDP reply payload len is %d, expected 1248." % elen
 	exit(1)
 
 exit(0)
