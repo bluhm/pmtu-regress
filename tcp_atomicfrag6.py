@@ -58,7 +58,7 @@ if frag is not None:
 	print "ERROR: matching IPv6 fragment TCP answer found"
 	exit(1)
 
-print "Send ACK again to trigger retransmit"
+print "Send ACK again to trigger retransmit."
 data=srp1(e/ip6/ack, iface=LOCAL_IF, timeout=5)
 
 if data is None:
