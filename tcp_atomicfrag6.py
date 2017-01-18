@@ -40,6 +40,7 @@ print "Path MTU discovery will not resend data, ICMP6 packet is ignored."
 ans=sniff(iface=LOCAL_IF, timeout=3, filter=
     "ip6 and src "+ip6.dst+" and dst "+ip6.src+" and proto ipv6-frag")
 
+print "IPv6 atomic fragments must not be generated."
 frag=None
 for a in ans:
 	fh=a.payload.payload
