@@ -54,7 +54,7 @@ print "UDP echo has IPv6 and UDP header, so expected payload len is 1448"
 elen = echo.plen + len(IPv6())
 print "elen=%d" % elen
 if elen != 1448:
-	print "ERROR: UDP echo paylod len is %d, expected 1448." % elen
+	print "ERROR: UDP echo payload len is %d, expected 1448." % elen
 	exit(1)
 
 print "Fragments contain multiple of 8 octets, so expected len is 1296"
