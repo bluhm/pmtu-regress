@@ -28,11 +28,11 @@ if data is None:
 print "Fill our receive buffer."
 time.sleep(1)
 
-print "Send ICMP6 packet too big packet with MTU 1300."
-icmp6=ICMPv6PacketTooBig(mtu=1300)/data.payload
+print "Send ICMP6 packet too big packet with MTU 1272."
+icmp6=ICMPv6PacketTooBig(mtu=1272)/data.payload
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/icmp6, iface=LOCAL_IF)
 
-print "Path MTU discovery will resend first data with length 1300."
+print "Path MTU discovery will resend first data with length 1272."
 data=srp1(e/ip6/ack, iface=LOCAL_IF, timeout=5)
 
 if data is None:
@@ -46,7 +46,7 @@ sendp(e/ip6/rst, iface=LOCAL_IF)
 
 len = data.plen + len(IPv6())
 print "len=%d" % len
-if len != 1300:
-	print "ERROR: TCP data packet len is %d, expected 1300." % len
+if len != 1272:
+	print "ERROR: TCP data packet len is %d, expected 1272." % len
 	exit(1)
 exit(0)
