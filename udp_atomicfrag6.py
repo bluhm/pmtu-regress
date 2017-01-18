@@ -9,6 +9,9 @@ from scapy.all import *
 e=Ether(src=LOCAL_MAC, dst=REMOTE_MAC)
 ip6=IPv6(src=FAKE_NET_ADDR6, dst=REMOTE_ADDR6)
 port=os.getpid() & 0xffff
+# inetd ignores packets from privileged port or nfs
+if port < 1024 or port == 2049:
+	port+=1024
 
 print "Send UDP packet with 1200 octets payload, receive echo."
 data=''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase +
