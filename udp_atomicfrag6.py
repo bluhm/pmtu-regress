@@ -64,4 +64,8 @@ if flen != 1256:
 	print "ERROR: UDP atomic fragment len is %d, expected 1256." % flen
 	exit(1)
 
+if len(ans) != 1:
+	print "ERROR: number of atomic fragment is %d, expected 1." % len(ans)
+	exit(1)
+
 exit(0)
