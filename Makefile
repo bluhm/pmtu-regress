@@ -118,7 +118,7 @@ run-regress-ping6: reset-route
 	ping6 -n -c 1 ${${ip}6}
 .endfor
 
-TARGETS +=	pmtu pmtu6 frag6
+TARGETS +=	pmtu pmtu6
 run-regress-pmtu: addr.py reset-route
 	@echo '\n======== $@ ========'
 	@echo Send ICMP fragmentation needed after fake TCP connect
@@ -127,10 +127,6 @@ run-regress-pmtu6: addr.py reset-route6
 	@echo '\n======== $@ ========'
 	@echo Send ICMP6 packet too big after fake TCP connect
 	${SUDO} ${PYTHON}tcp_connect6.py
-run-regress-frag6: addr.py reset-route6
-	@echo '\n======== $@ ========'
-	@echo Send ICMP6 and try to trigger an atomic IPv6 fragment
-	${SUDO} ${PYTHON}tcp_atomicfrag6.py
 
 TARGETS +=	udp6
 run-regress-udp6: addr.py reset-route6
@@ -149,6 +145,17 @@ run-regress-gateway6: run-regress-udp6
 	grep -q 'gateway: ${LOCAL_ADDR6}' pmtu.route
 	grep -q 'flags: <UP,GATEWAY,HOST,DYNAMIC,DONE>' pmtu.route
 	${SUDO} ${PYTHON}udp_echo6.py
+
+TARGETS +=	tcpfrag6 udpfrag6
+run-regress-tcpfrag6: addr.py reset-route6
+	@echo '\n======== $@ ========'
+	@echo Send ICMP6 and try to trigger a short TCP segment
+	${SUDO} ${PYTHON}tcp_atomicfrag6.py
+run-regress-udpfrag6: addr.py reset-route6
+	@echo '\n======== $@ ========'
+	@echo Send ICMP6 and try to trigger an atomic UDP IPv6 fragment
+	${SUDO} ${PYTHON}udp_atomicfrag6.py
+
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
