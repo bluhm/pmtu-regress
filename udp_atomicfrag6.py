@@ -58,10 +58,6 @@ if frag.m != 0:
         print "ERROR: TCP fragment is not atomic, more fragment bit is set."
         exit(1)
 
-if len(ans) != 1:
-	print "ERROR: number of atomic fragment is %d, expected 1." % len(ans)
-	exit(1)
-
 print "UDP echo has IPv6 and UDP header, so expected payload len is 1248"
 elen = echo.plen + len(IPv6())
 print "elen=%d" % elen
