@@ -54,12 +54,12 @@ else:
 	exit(1)
 
 if frag.offset != 0:
-        print "ERROR: TCP fragment is not atomic, offset is %d." % frag.offset
-        exit(1)
+	print "ERROR: TCP fragment is not atomic, offset is %d." % frag.offset
+	exit(1)
 
 if frag.m != 0:
-        print "ERROR: TCP fragment is not atomic, more fragment bit is set."
-        exit(1)
+	print "ERROR: TCP fragment is not atomic, more fragment bit is set."
+	exit(1)
 
 print "UDP echo has IPv6 and UDP header, so expected payload len is 1248"
 elen = echo.plen + len(IPv6())
