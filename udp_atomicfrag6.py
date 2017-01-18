@@ -20,14 +20,14 @@ if echo is None:
 	print "ERROR: no UDP answer from echo server received"
 	exit(1)
 
-print "Send ICMP6 packet too big packet with MTU 1300."
-icmp6=ICMPv6PacketTooBig(mtu=1300)/echo.payload
+print "Send ICMP6 packet too big packet with MTU 1272."
+icmp6=ICMPv6PacketTooBig(mtu=1272)/echo.payload
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/icmp6, iface=LOCAL_IF)
 
 print "Clear route cache at echo socket by sending from different address."
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 
-print "Path MTU discovery will send UDP fragment with maximum length 1300."
+print "Path MTU discovery will send UDP fragment with maximum length 1272."
 # srp1 cannot be used, fragment answer will not match on outgoing udp packet
 if os.fork() == 0:
 	time.sleep(1)
