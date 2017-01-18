@@ -59,7 +59,7 @@ if frag is not None:
 print "Send echo again and expect reply without fragmentation."
 reply=srp1(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 
-print "UDP echo has IPv6 and UDP header, so expected payload len is 1248"
+print "UDP echo has IPv6 and UDP header, so expected payload len is 1248."
 elen = reply.plen + len(IPv6())
 print "rlen=%d" % elen
 if elen != 1248:
