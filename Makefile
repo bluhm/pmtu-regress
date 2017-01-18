@@ -89,8 +89,6 @@ PYTHON =	python2.7 -u ./
 PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 -u ${.CURDIR}/
 .endif
 
-.PHONY: clean-arp
-
 # Clear local and remote path mtu routes, set fake net route
 reset-route:
 	@echo '\n======== $@ ========'
