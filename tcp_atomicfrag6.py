@@ -60,6 +60,14 @@ rst=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='AR',
     ack=synack.seq+1)
 sendp(e/ip6/rst, iface=LOCAL_IF)
 
+if frag.offset != 0:
+	print "ERROR: TCP fragment is not atomic, offset is %d." % frag.offset
+	exit(1)
+
+if frag.m != 0:
+	print "ERROR: TCP fragment is not atomic, more fragment bit is set."
+	exit(1)
+
 print "Atomic fragment contains 8 octet header, so expected len is 1280"
 flen = frag.plen + len(IPv6())
 print "flen=%d" % flen
