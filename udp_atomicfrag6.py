@@ -31,7 +31,7 @@ print "Clear route cache at echo socket by sending from different address."
 sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/udp, iface=LOCAL_IF)
 
 print "Path MTU discovery will not send UDP atomic fragment."
-# srp1 cannot be used, fragment answer will not match on outgoing udp packet
+# srp1 cannot be used, fragment answer will not match on outgoing UDP packet
 if os.fork() == 0:
 	time.sleep(1)
 	sendp(e/ip6/udp, iface=LOCAL_IF)

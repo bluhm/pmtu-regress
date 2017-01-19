@@ -30,7 +30,7 @@ time.sleep(1)
 
 print "Send ICMP6 packet too big packet with MTU 1272."
 icmp6=ICMPv6PacketTooBig(mtu=1272)/data.payload
-# srp1 cannot be used, fragment answer will not match outgoing icmp packet
+# srp1 cannot be used, fragment answer will not match outgoing ICMP6 packet
 if os.fork() == 0:
 	time.sleep(1)
 	sendp(e/IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/icmp6, iface=LOCAL_IF)
